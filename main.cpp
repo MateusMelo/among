@@ -9,6 +9,6 @@
 
 int main(int argc, char *argv[]) {
     auto app = Gtk::Application::create(argc, argv, "org.gtkmm.example");
-    MainWindow mainWindow;
-    return app->run(mainWindow);
+    MainWindow main_window;
+    return app->run(main_window);
 }
