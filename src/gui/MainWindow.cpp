@@ -25,7 +25,10 @@ using bsoncxx::builder::stream::finalize;
 using bsoncxx::builder::stream::open_array;
 using bsoncxx::builder::stream::open_document;
 
-MainWindow::MainWindow() : v_box(Gtk::Orientation::ORIENTATION_VERTICAL) {
+MainWindow::MainWindow() :
+v_box(Gtk::Orientation::ORIENTATION_VERTICAL),
+uri("mongodb://localhost:27017"),
+client(uri) {
     set_title("among");
     set_border_width(5);
     set_default_size(800, 600);
@@ -41,12 +44,6 @@ MainWindow::MainWindow() : v_box(Gtk::Orientation::ORIENTATION_VERTICAL) {
     ref_tree_store = Gtk::TreeStore::create(model_column);
     tree_view.set_model(ref_tree_store);
 
-    mongocxx::instance instance{};
-    mongocxx::uri uri("mongodb://localhost:27017");
-    mongocxx::client client(uri);
-    mongocxx::database db = client["among"];
-    mongocxx::collection coll = db["among_c"];
-
     for (auto const& db_name: client.list_database_names()) {
         Gtk::TreeModel::Row row = *(ref_tree_store->append());
         row[model_column.m_col_name] = db_name;
@@ -61,4 +58,26 @@ MainWindow::MainWindow() : v_box(Gtk::Orientation::ORIENTATION_VERTICAL) {
     tree_view.append_column("Databases", model_column.m_col_name);
 
     show_all_children();
+
+    tree_view.signal_row_activated().connect(sigc::mem_fun(*this,
+                                                            &MainWindow::on_treeview_row_activated) );
+
+
+}
+
+void MainWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn*) {
+    const auto iter = ref_tree_store->get_iter(path);
+    if(iter) {
+        const auto row = *iter;
+
+        std::string db_name = row.parent()->get_value(model_column.m_col_name);
+        std::string coll_name = row.get_value(model_column.m_col_name);
+
+        mongocxx::database db = client.database(db_name);
+        mongocxx::collection coll = db.collection(coll_name);
+        mongocxx::cursor cursor = coll.find({});
+        for(auto doc : cursor) {
+            std::cout << bsoncxx::to_json(doc) << "\n";
+        }
+    }
 }

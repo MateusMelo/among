@@ -11,7 +11,7 @@ class ModelColumn : public Gtk::TreeModel::ColumnRecord {
 public:
     ModelColumn();
 
-    Gtk::TreeModelColumn<Glib::ustring> m_col_name;
+    Gtk::TreeModelColumn<std::string> m_col_name;
 };
 
 #endif //AMONG_MODELCOLUMN_H
