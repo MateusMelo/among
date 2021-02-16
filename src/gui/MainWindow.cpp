@@ -40,6 +40,7 @@ client(uri) {
     scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 
     v_box.pack_start(scrolled_window);
+    v_box.pack_end(notebook);
 
     ref_tree_store = Gtk::TreeStore::create(model_column);
     tree_view.set_model(ref_tree_store);
@@ -76,8 +77,15 @@ void MainWindow::on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk
         mongocxx::database db = client.database(db_name);
         mongocxx::collection coll = db.collection(coll_name);
         mongocxx::cursor cursor = coll.find({});
+        std::string txt;
         for(auto doc : cursor) {
-            std::cout << bsoncxx::to_json(doc) << "\n";
+            txt += bsoncxx::to_json(doc);
+//            std::cout << bsoncxx::to_json(doc) << "\n";
         }
+
+        lb.set_text(txt);
+        notebook.append_page(lb, coll_name);
+
+        show_all_children();
     }
 }

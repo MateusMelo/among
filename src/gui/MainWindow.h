@@ -13,20 +13,23 @@
 #include "ModelColumn.h"
 
 class MainWindow : public Gtk::Window {
-    ModelColumn model_column;
-
-    Gtk::VBox v_box;
-
-    Gtk::ScrolledWindow scrolled_window;
-    Gtk::TreeView tree_view;
-    Glib::RefPtr<Gtk::TreeStore> ref_tree_store;
-
-    mongocxx::instance instance{};
-    mongocxx::uri uri;
-    mongocxx::client client;
-
     protected:
-        void on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
+        ModelColumn model_column;
+
+        Gtk::VBox v_box;
+
+        Gtk::ScrolledWindow scrolled_window;
+        Gtk::TreeView tree_view;
+        Glib::RefPtr<Gtk::TreeStore> ref_tree_store;
+
+        Gtk::Notebook notebook;
+        Gtk::Label lb;
+
+        mongocxx::instance instance{};
+        mongocxx::uri uri;
+        mongocxx::client client;
+
+    void on_treeview_row_activated(const Gtk::TreeModel::Path& path, Gtk::TreeViewColumn* column);
 
     public:
         MainWindow();
